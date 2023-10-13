@@ -139,7 +139,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'utils.logging.JsonFieldsFileHandler',
-            'filename': os.path.join(BASE_DIR, 'log', 'example.log'),
+            'filename': os.path.join(BASE_DIR, 'example.log'),
             'formatter': 'verbose',
             'encoding': 'utf8'
             },
