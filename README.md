@@ -1,13 +1,13 @@
 # Google Cloud logging in a Django project
 
-I implemented a simple extension of the Python logger to access Google Cloud structured logging and to use additional log levels 'NOTICE', 'ALERT' and 'EMERGENCY' with minimal changes to a Django project.
+The code presented here provides an interface to Google Cloud logging. It allows writing structural data and emitting logs with 'NOTICE', 'ALERT' and 'EMERGENCY' levels. It requires only minimal changes to a Django project and supports all other features of the Python logger.
 
-For example, the following call
+For example, the call
 
 ```
-logger.notice('notice with data', x=1, y='foo', z={'k1':10,'k2':20})
+logger.notice('A notice with a data payload', x=1, y='foo', z={'k1':10,'k2':20})
 ```
-produces the following log entry in the Google Cloud Logging
+emits an entry in the Google Cloud logging, such as
 ```
 {
   "insertId": "1qpskcifhsqcri",
@@ -18,25 +18,25 @@ produces the following log entry in the Google Cloud Logging
       "k1": 10,
       "k2": 20
     },
-    "message": "notice with data"
+    "message": "A notice with a data payload"
   },
   ...
 ```
-Additionally, you may direct the output to a file:
+Additionally, you may redirect the output to a file or any other destination supported by the Python logger:
 ```
-... notice with data {'x': 1, 'y': 'foo', 'z': {'k1': 10, 'k2': 20}} ...
+... A notice with a data payload {'x': 1, 'y': 'foo', 'z': {'k1': 10, 'k2': 20}} ...
 ```
 Calls `logger.error('an error message'), logger.info('FYI'), etc.` work as expected.
 
-The implementation is in utils/logging.py file. That's the only file you need.
-The rest of the files are for demonstration purposes in the Django environment.
+The implementation is in the utils/logging.py file. That is the only file you need.
+The rest of the files here are for a quick setup of a demo.
 
 ## How to set up
-1. Set Up Google Cloud Logging for Python. See [Google Docs.](https://cloud.google.com/logging/docs/setup/python)
-2. Add utils/logging.py file to your project
-3. Modify settings.py file. Below is an example config enabling logging to Google Cloud and a file.
+1. Set Up Google Cloud logging for Python. See [Google Docs.](https://cloud.google.com/logging/docs/setup/python)
+2. Add the file utils/logging.py to your project
+3. Modify the settings.py file.
 
-   You will need to specify:
+   You will need:
    
     `LOGGING_CONFIG = 'utils.logging.logging_config'`, where
     `logging_config` is a helper function for additional configuration steps
@@ -44,13 +44,13 @@ The rest of the files are for demonstration purposes in the Django environment.
     `gcplog 'class: 'utils.logging.CloudLoggingHandlerX'`
     to map logger levels to Google Cloud severity levels
     
-    `gcplog 'client': google_cloud_client()` to instantiate Google Cloud logger client
+    `gcplog 'client': google_cloud_client()` to instantiate Google Cloud logging client
           
-    `file 'class': 'utils.logging.JsonFieldsFileHandler'` you may want to use this handler to add json_fields in the file entries, shown in examples here
+    `file 'class': 'utils.logging.JsonFieldsFileHandler'` if you want to write JSON fields in the log file as shown in examples here
 
-     You can specify logger levels with custom labels: `'NOTICE', 'ALERT', 'EMERGENCY'`.
+   Use custom labels `'NOTICE', 'ALERT', 'EMERGENCY'` if you want to specify Google Cloud logging levels 
 
-Here is a complete example of an addition to your configuration:
+Here is a complete example of a configuration enabling logging to Google Cloud and a file.
 
 ```
 import os
@@ -107,7 +107,7 @@ $ ./manage.py shell
 >>> l.notice('notice with no additional data')
 >>> l.notice('notice with data', x=1, y='foo', z={'k1':10,'k2':20})
 ```
-That produces two entries in the ecample.log file and two Google Cloud Logging entries:
+That produces two entries in the ecample.log file and two Google Cloud logging entries:
 
 ```
 2023-10-12 01:35:36,731 4462732800@31686 NOTICE  mysite notice with no additional data {<console>:1 <module>}
@@ -169,7 +169,7 @@ That produces two entries in the ecample.log file and two Google Cloud Logging e
   "receiveTimestamp": "2023-10-12T01:37:08.230030431Z"
 }
 ```
-Note that a log entry with no additional (structured) data is saved in `textPayload` field. If you supply additional data, the output is saved in the `jsonPayload` property.
+Note that a log entry with no additional (structured) data is saved as the `textPayload` field. If you supply additional data, the output is saved as the `jsonPayload` property.
 
 I hope you find it useful.
 
