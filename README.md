@@ -1,13 +1,14 @@
-# Google Cloud logging in a Django project
+# Google Cloud Platform Logging in a Django project
 
-The code presented here provides an interface to Google Cloud logging. It allows writing structural data and emitting logs with 'NOTICE', 'ALERT' and 'EMERGENCY' levels. It requires only minimal changes to a Django project and supports all other features of the Python logger.
+Django projects use the standard Python Logging module to write logs to various destinations, including the Google Cloud Platform Logging. However, Google Logging provides more features than the Python Logging module. For example, Google Logging introduced structural logs and additional logging levels. You may use the Google Logging API client library for Python directly, but that’s not ideal in many cases.
+The code presented here provides an interface to Google Logging via the Python Logging module API with additional functionality. It allows writing structural logs and emitting records with 'NOTICE', 'ALERT' and 'EMERGENCY' levels. It requires only minimal changes to a Django project and supports all other features of the Python logger.
 
 For example, the call
 
 ```
 logger.notice('A notice with a data payload', x=1, y='foo', z={'k1':10,'k2':20})
 ```
-emits an entry in the Google Cloud logging, such as
+emits an entry in the Google Logging, such as
 ```
 {
   "insertId": "1qpskcifhsqcri",
@@ -32,7 +33,7 @@ The implementation is in the utils/logging.py file. That is the only file you ne
 The rest of the files here are for a quick setup of a demo.
 
 ## How to set up
-1. Set Up Google Cloud logging for Python. See [Google Docs.](https://cloud.google.com/logging/docs/setup/python)
+1. Set Up Google Logging for Python. See [Google Docs.](https://cloud.google.com/logging/docs/setup/python)
 2. Add the file utils/logging.py to your project
 3. Modify the settings.py file.
 
@@ -44,13 +45,13 @@ The rest of the files here are for a quick setup of a demo.
     `gcplog 'class: 'utils.logging.CloudLoggingHandlerX'`
     to map logger levels to Google Cloud severity levels
     
-    `gcplog 'client': google_cloud_client()` to instantiate Google Cloud logging client
+    `gcplog 'client': google_cloud_client()` to instantiate Google Logging client
           
     `file 'class': 'utils.logging.JsonFieldsFileHandler'` if you want to write JSON fields in the log file as shown in examples here
 
-   Use custom labels `'NOTICE', 'ALERT', 'EMERGENCY'` if you want to specify Google Cloud logging levels 
+   Use custom labels `'NOTICE', 'ALERT', 'EMERGENCY'` if you want to specify Google Logging levels 
 
-Here is a complete example of a configuration enabling logging to Google Cloud and a file.
+Here is an example of a configuration enabling logging to the Google Cloud and a file.
 
 ```
 import os
@@ -86,6 +87,9 @@ LOGGING = {
         }
     }
 ```
+### Note on authentication with GCP
+If you use a credential JSON file for authentication, you may pass the location of the file to the `google_cloud_client` function. The function will set `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+Other [authentication methods](https://cloud.google.com/docs/authentication/client-libraries) are available too.
 
 # How to test
 
@@ -107,7 +111,7 @@ $ ./manage.py shell
 >>> l.notice('notice with no additional data')
 >>> l.notice('notice with data', x=1, y='foo', z={'k1':10,'k2':20})
 ```
-That produces two entries in the ecample.log file and two Google Cloud logging entries:
+That produces two entries in the ecample.log file and two Google Logging entries:
 
 ```
 2023-10-12 01:35:36,731 4462732800@31686 NOTICE  mysite notice with no additional data {<console>:1 <module>}
