@@ -174,6 +174,3 @@ That produces two entries in the ecample.log file and two Google Logging entries
 }
 ```
 Note that a log entry with no additional (structured) data is saved as the `textPayload` field. If you supply additional data, the output is saved as the `jsonPayload` property.
-
-I hope you find it useful.
-
